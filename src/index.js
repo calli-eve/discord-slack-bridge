@@ -34,9 +34,6 @@ discord.once(Events.ClientReady, (client) => {
 
 // Handle Discord messages
 discord.on(Events.MessageCreate, async (message) => {
-  // Ignore bot messages
-  if (message.author.bot) return;
-
   // Find matching channel connection
   const connection = channelConnections.find(conn => conn.discord === message.channelId);
   if (!connection) return;
@@ -45,8 +42,13 @@ discord.on(Events.MessageCreate, async (message) => {
     // Get the channel name
     const channelName = message.channel.name;
     
-    // Get the member's display name (nickname) or fall back to username
-    const displayName = message.member?.displayName || message.author.username;
+    // Get the display name - handle both bot and user messages
+    let displayName;
+    if (message.author.bot) {
+      displayName = message.author.username; // For bots, use their username
+    } else {
+      displayName = message.member?.displayName || message.author.username;
+    }
 
     // Format the message with channel name and display name
     const formattedMessage = `[#${channelName}] **${displayName}**: ${message.content}`;
