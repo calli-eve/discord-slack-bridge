@@ -1,0 +1,9 @@
+services:
+  discord-slack-bridge:
+    build: .
+    container_name: discord-slack-bridge
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src

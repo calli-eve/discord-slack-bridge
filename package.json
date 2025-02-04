@@ -1,0 +1,19 @@
+{
+  "name": "discord-slack-bridge",
+  "version": "1.0.0",
+  "description": "A bridge to relay messages between Discord and Slack",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "@slack/web-api": "^7.0.2",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+} 
