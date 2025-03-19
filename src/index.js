@@ -50,8 +50,44 @@ discord.on(Events.MessageCreate, async (message) => {
       displayName = message.member?.displayName || message.author.username;
     }
 
+    // Get the message content and resolve mentions
+    let resolvedContent = message.content;
+    
+    // Replace role mentions
+    resolvedContent = resolvedContent.replace(/<@&(\d+)>/g, (match, roleId) => {
+      const role = message.guild.roles.cache.get(roleId);
+      return role ? `@${role.name}` : match;
+    });
+    
+    // Replace user mentions
+    resolvedContent = resolvedContent.replace(/<@!?(\d+)>/g, (match, userId) => {
+      const user = message.guild.members.cache.get(userId);
+      return user ? `@${user.displayName}` : match;
+    });
+    
+    // Replace channel mentions
+    resolvedContent = resolvedContent.replace(/<#(\d+)>/g, (match, channelId) => {
+      const channel = message.guild.channels.cache.get(channelId);
+      return channel ? `#${channel.name}` : match;
+    });
+
+    // Handle embeds if present
+    if (message.embeds.length > 0) {
+      const embedContent = message.embeds.map(embed => {
+        let content = '';
+        if (embed.title) content += `**${embed.title}**\n`;
+        if (embed.description) content += `${embed.description}\n`;
+        if (embed.fields) {
+          content += embed.fields.map(field => `**${field.name}**\n${field.value}`).join('\n\n');
+        }
+        return content.trim();
+      }).join('\n\n');
+      
+      resolvedContent = resolvedContent + (resolvedContent ? '\n\n' : '') + embedContent;
+    }
+
     // Format the message with channel name and display name
-    const formattedMessage = `[#${channelName}] **${displayName}**: ${message.content}`;
+    const formattedMessage = `[#${channelName}] **${displayName}**: ${resolvedContent}`;
 
     // Send message to corresponding Slack channel
     await slack.chat.postMessage({
